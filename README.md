@@ -1,149 +1,336 @@
 # VeriProcure AI
 
-**Telegraph Hackathon Season II — Track 03: Apps & Agents / Mission 10: Model Economy**
+Live demo: https://veriprocure-ai.vercel.app
 
-VeriProcure AI is a solo-built machine-customer application. It purchases code-generation intelligence, independently purchases a requirements/reference answer, and purchases an LLM evaluation through Telegraph. It records the actual returned Intent, Miner, observed cost, latency, receipt headers, signal hash and signal lookup result.
+VeriProcure AI is a production-minded, user-authenticated procurement dashboard for verified AI/LLM execution on the Telegraph ecosystem. It lets a user sign up, connect a Sepolia wallet, submit a task, and automatically run a three-step procurement flow that retrieves:
 
-## Status and honest limitations
+1. a generated answer,
+2. a reference answer, and
+3. an evaluation of the generated answer.
 
-This is an implementation starter with the three-call workflow and audit persistence wired in. It has **not** yet been validated against a live paid testnet wallet in this environment. Before calling it a completed hackathon entry, run the real integration checks below.
+Each step is paid through Telegraph’s x402-compatible flow, and the app records the actual intent, miner, latency, receipt metadata, cost, and verification outcome for later review.
 
-The Engine auto-router receives natural-language queries. Each query asks for a specific mission Intent, but the app checks and records the actual returned `intent`; it does not assume routing succeeded. A run is marked `completed` only when all three returned Intent names match, all three signal lookups succeed, and all three Telegraph receipts are present. Otherwise it is retained as `needs_review` or `partial`.
+This project is built for a hackathon and for real-world public deployment readiness. It combines a Next.js frontend, Prisma/PostgreSQL persistence, a secure auth session layer, wallet authorization, and a verification pipeline designed to be transparent about what was actually purchased and how it was validated.
 
-The evaluator score is an LLM assessment, not ground truth. This starter does not claim deterministic correctness or a cost-per-verified-correct-answer leaderboard yet. That requires isolated execution of task-specific tests and a repeatable benchmark harness.
+## Project vision
 
-## Requirements
+The core idea is simple:
 
-- Docker Engine and Docker Compose v2
-- Node.js 20+ (22 recommended) and npm for local wallet setup
-- Ethereum Sepolia ETH for gas
-- Telegraph test USDC
+- Make AI procurement auditable instead of opaque.
+- Ensure buyers know which Intent was actually returned by the engine.
+- Give each user their own wallet authorization model instead of a single global wallet.
+- Record what was paid, what was returned, and whether the response actually matched the expected workflow.
+- Keep the public-facing app clean and non-sensitive while storing private keys and credentials in a secure host-managed environment.
 
-## 1. Prepare local environment
+## Live site overview
+
+The current live deployment is available at:
+
+- https://veriprocure-ai.vercel.app
+
+End users can:
+
+- create an account or sign in,
+- add a Sepolia wallet address and configure wallet authorization,
+- submit a task for procurement,
+- watch the app run the three-step procurement flow,
+- review evidence: costs, miner names, intents, signal hashes, and verification results.
+
+## What the app does
+
+The app acts like a verified procurement agent for AI tasks.
+
+It performs a structured workflow for each task:
+
+- Step 1: generation request
+- Step 2: independent reference generation
+- Step 3: evaluation of the result
+
+At each stage it checks:
+
+- which Intent actually returned,
+- which Miner served the request,
+- whether the price challenge was valid,
+- whether the returned signal and receipt are available,
+- whether the full transaction chain is consistent enough to mark it as verified.
+
+The app stores the provenance of every run, which is useful for demoing, auditing, and future benchmarking.
+
+## Architecture overview
+
+### High-level architecture
+
+```mermaid
+flowchart TD
+    U[End User] --> FE[Next.js Frontend]
+    FE --> AUTH[Auth + Session Layer]
+    FE --> WALLET[Wallet Authorization]
+    FE --> API[Protected API Routes]
+    API --> DB[(PostgreSQL / Prisma)]
+    API --> TP[Telegraph Engine + Miners]
+    TP --> G[Generation Intent]
+    TP --> R[Reference Intent]
+    TP --> E[Evaluation Intent]
+    G --> VERIFY[Verification + Signal Checks]
+    R --> VERIFY
+    E --> VERIFY
+    VERIFY --> DB
+    VERIFY --> UI[Dashboard / Evidence View]
+```
+
+### End-user workflow
+
+```mermaid
+flowchart LR
+    A[Create account / sign in] --> B[Add Sepolia wallet]
+    B --> C[Submit task]
+    C --> D[Procure generation]
+    D --> E[Procure reference]
+    E --> F[Procure evaluation]
+    F --> G[Check intent, receipts, and signals]
+    G --> H[Persist results + show evidence]
+```
+
+### Production architecture
+
+```mermaid
+flowchart TB
+    SUB[User Browser] --> VERCEL[Vercel Hosting]
+    VERCEL --> NEXT[Next.js App]
+    NEXT --> PRISMA[Prisma ORM]
+    PRISMA --> PG[(Production Postgres)]
+    NEXT --> KEYVAULT[Secret Manager / Vercel Env Secrets]
+    NEXT --> TELEGRAPH[Telegraph Engine API]
+    TELEGRAPH --> SEPOLIA[Sepolia RPC + Wallet]
+```
+
+## How the procurement flow works
+
+The app’s core flow is a three-part verification loop.
+
+### 1. Generation
+
+The system asks for a generated answer for a task and records:
+
+- returned intent,
+- returned miner,
+- cost,
+- latency,
+- receipt information,
+- signal hash,
+- status of verification.
+
+### 2. Reference procurement
+
+The app independently procures a reference answer for the same task so the generated result can be judged against a second source of truth.
+
+### 3. Evaluation
+
+The app asks the engine to evaluate the generated answer against the task and reference result.
+
+This makes the run more transparent and gives a user a traceable evidence trail instead of a black-box output.
+
+## User experience on the deployed site
+
+On the live app, the user goes through this flow:
+
+1. Sign up or log in.
+2. Add their Sepolia wallet to the wallet panel.
+3. Submit a task in the main procurement panel.
+4. Watch the app progress through generation, reference, and evaluation phases.
+5. Review evidence such as:
+   - response summaries,
+   - total spend,
+   - time taken,
+   - returned intents,
+   - miner names,
+   - signal data,
+   - verification status.
+
+The public UI is intentionally designed to avoid exposing private keys, raw internal config, or sensitive host metadata.
+
+## Tech stack
+
+- Next.js 15
+- React 19
+- TypeScript
+- Prisma ORM
+- PostgreSQL
+- Vercel hosting
+- Telegraph Engine + x402-style payment flow
+- Sepolia testnet wallet integration
+- Protected server-side API routing
+- Session-based auth with Prisma-backed user records
+
+## Core project structure
+
+```text
+.
+├── prisma/
+│   └── schema.prisma
+├── public/
+├── scripts/
+│   ├── create-test-wallet.mjs
+│   ├── mint-test-usdc.mjs
+│   └── ...
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── lib/
+│   │   ├── auth.ts
+│   │   ├── config.ts
+│   │   ├── logger.ts
+│   │   ├── rate-limit.ts
+│   │   ├── secrets.ts
+│   │   ├── telegraph.ts
+│   │   └── wallet-config.ts
+├── .env.example
+├── .env.production.example
+├── .env.vercel.example
+├── .gitignore
+├── Dockerfile
+├── azure.yaml
+├── docker-compose.yml
+├── docker-compose.prod.yml
+├── LICENSE
+├── next.config.ts
+├── package.json
+├── package-lock.json
+├── README.md
+├── vercel.json
+└── ...
+```
+
+## Local setup
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+- PostgreSQL database (local or hosted)
+- Sepolia test ETH for gas
+- Telegraph test USDC for payment verification
+
+### Install
 
 ```bash
 npm install
+```
+
+### Environment setup
+
+Create the required environment file from the template:
+
+```bash
 cp .env.example .env.local
 ```
 
-Edit `.env.local`. Set a strong local `POSTGRES_PASSWORD` and retain a conservative `MAX_REQUEST_USD=0.02`.
+Then fill in the required values for:
 
-## 2. Create or register a dedicated Sepolia test wallet
+- `DATABASE_URL`
+- `AUTH_SECRET`
+- `EVM_PRIVATE_KEY` or secret-file pattern
+- payment and rate limiting settings
+- RPC URL / Telegraph endpoints if required by your environment
 
-```bash
-npm run wallet:create
-```
+Important:
 
-The script writes the private key to `.env.local`, sets restrictive file permissions and prints only the public address. It refuses to overwrite an existing key. Never share the private key or seed phrase, and never use a mainnet wallet.
+- Never commit real env values.
+- Use local development values only in `.env.local`.
+- Use Vercel or another secure secret manager in production.
 
-For a production-style self-serve deployment, the app also exposes a wallet form in the dashboard that accepts a Sepolia wallet address and private key and saves the configuration server-side. This allows end users to add their own Sepolia wallet for x402 payments without modifying the source code.
-
-## 3. Fund with test assets
-
-Follow `docs/WALLET_SETUP.md`:
-1. Fund the generated address with Sepolia ETH from a reputable faucet.
-2. Mint 10 Telegraph test USDC using `npm run wallet:mint-usdc`.
-3. Check the mint transaction on a Sepolia block explorer.
-
-## 4. Run with Docker
+### Database setup
 
 ```bash
-docker compose --env-file .env.local up --build
+npx prisma db push
 ```
 
-Open http://localhost:3000.
-
-Stop the containers:
+Or for migration-driven setup:
 
 ```bash
-docker compose --env-file .env.local down
+npm run db:migrate
 ```
 
-Remove the database volume only if you intentionally want to delete local history:
+### Run locally
 
 ```bash
-docker compose --env-file .env.local down -v
+npm run dev
 ```
 
-## 5. Three-purchase workflow
+Open:
 
-1. `CODE_GENERATION`: procure a proposed implementation.
-2. `QUESTION_ANSWERING`: independently procure requirements, facts and an acceptance checklist.
-3. `LLM_OUTPUT_EVALUATION`: procure an assessment against the task and reference.
-4. Preserve each actual returned Intent and Miner, `cost_usd`, `duration_ms`, `signal_hash`, `X-TELEGRAPH-RECEIPT` and `PAYMENT-RESPONSE`.
-5. Verify each signal using `GET /engine/v1/signal/{signal_hash}`.
-6. Persist every completed step immediately, so a later failure does not erase earlier paid evidence.
+- http://localhost:3000
+- or the configured port in your environment
 
-Each payment challenge is inspected before the x402 SDK signs it. `MAX_REQUEST_USD` is the per-request ceiling. Three calls at a $0.02 ceiling create a maximum configured run exposure of $0.06, excluding gas. A daily spend ceiling is also enforced. Actual prices are read from each live 402 challenge, not assumed.
-
-## API routes
-
-- `GET /api/health` — server configuration status, without secrets
-- `GET /api/intents` — live Intent catalogue
-- `GET /api/intents/CODE_GENERATION` — live schema for one Intent
-- `GET /api/miners?intent=CODE_GENERATION` — current Miner availability
-- `GET /api/readiness` — schema and Miner-coverage checks for the three required Intents
-- `GET /api/history` — recent runs, including partial runs
-- `GET /api/leaderboard` — observed provider economics, with limitations stated
-- `GET /api/signals?hash=0x...` — signal lookup
-- `POST /api/procure` with `{ "task": "..." }` — performs the three paid requests
-
-## Required live verification
-
-Use the canonical testnet node:
-
-`https://devnode.telegraphprotocol.com`
-
-The official docs identify these endpoints:
+### Production build
 
 ```bash
-curl https://devnode.telegraphprotocol.com/engine/v1/intents
-curl https://devnode.telegraphprotocol.com/engine/v1/intents/CODE_GENERATION
-curl 'https://devnode.telegraphprotocol.com/api/miners?intent=CODE_GENERATION'
-curl https://devnode.telegraphprotocol.com/engine/v1/intents/QUESTION_ANSWERING
-curl 'https://devnode.telegraphprotocol.com/api/miners?intent=QUESTION_ANSWERING'
-curl https://devnode.telegraphprotocol.com/engine/v1/intents/LLM_OUTPUT_EVALUATION
-curl 'https://devnode.telegraphprotocol.com/api/miners?intent=LLM_OUTPUT_EVALUATION'
+npm run build
+npm run start
 ```
 
-Do not infer live Miner availability from the marketing page. The live catalogue is authoritative. The Engine may auto-route a natural-language query to another Intent; inspect the returned `intent` and mark mismatches as non-qualifying until the request is corrected to use the exact canonical schema.
+## Security and privacy model
 
-## Hackathon acceptance work still required
+The application is designed to avoid exposing sensitive internals to public users.
 
-- Run the three actual paid calls on Sepolia and verify the exact returned Intent for each.
-- Verify that every paid response includes the expected Telegraph receipt and that each signal lookup is reproducible.
-- Build task-specific gold tests and an isolated execution runner with no network, CPU/memory/time limits and disposable filesystem.
-- Only compute cost per verified correct answer when the deterministic test suite passes; display benchmark coverage and sample count.
-- Add user authentication, per-user wallet authorization, public-route protection, rate limiting and monitoring before any public deployment.
-- Add automated tests for over-budget 402 challenges, unsupported payment networks, missing receipts, signal lookup failures, no compatible Miner, partial runs and successful three-call procurement.
-- Capture a 2–5 minute demo with real testnet evidence and provide judge-friendly reproduction instructions.
+Key protections include:
 
-## Production deployment checklist
+- authenticated access for wallet actions,
+- user-scoped wallet authorization,
+- environment separation between local and production config,
+- secret-file support for deployment environments,
+- rate limiting and throttling,
+- redacted logging,
+- public-safe health endpoints,
+- no private key exposure in the frontend.
 
-Before publishing to GitHub or deploying publicly, complete the following:
+The project intentionally avoids leaking sensitive wallet metadata and private internal configuration into the browser.
 
-1. Move all secrets to a real secret manager (Azure Key Vault, Vercel Secrets, Docker secrets, or the host secret vault).
-2. Use separate production and test configuration. Never reuse `.env.local` or development database credentials in production.
-3. Set `NODE_ENV=production`, `ALLOW_DEMO_AUTH=false`, and a strong `AUTH_SECRET`.
-4. Configure a production-grade PostgreSQL database and keep it separate from local/dev data.
-5. Replace the in-memory rate limiter with a distributed limiter if the app is exposed publicly or scaled horizontally.
-6. Confirm all wallet actions require authenticated users and that wallet authorization is tied to the signed-in account.
-7. Keep `MAX_REQUEST_USD` and `MAX_DAILY_SPEND_USD` conservative, and never allow a wallet containing real funds to be used for the app.
-8. Use monitored logs, health checks, and alerting, but never log private keys, raw wallet payloads, or auth tokens.
-9. Only publish a public repo after removing any internal values, private wallets, local addresses, or environment files with secrets.
-10. Keep the public UI free of internal details and wallet metadata; display status only, not private config.
+## Production deployment notes
 
-A production example environment file is available at `.env.production.example`; copy it to a secure host-managed configuration and fill in real values without committing them.
+This project is configured for deployment on Vercel and is live at:
 
-## Security
+- https://veriprocure-ai.vercel.app
 
-The private key is server-side only. `.env.local` and `.env.production` are gitignored and must never be committed. Use a dedicated test wallet and low limits. Do not expose the procurement API publicly before adding authentication and per-user authorization. The testnet wallet must not contain valuable assets.
+For a production public deployment, use:
+
+- Vercel secret environment variables,
+- a production PostgreSQL instance,
+- a dedicated Sepolia wallet with limited funds,
+- separate env files for dev and prod,
+- a proper production secret manager if the app scales.
+
+## Public repo readiness checklist
+
+Before pushing the project to a public GitHub repo, make sure:
+
+- no real `.env` files are committed,
+- no wallet private keys are stored in the repo,
+- no internal testing credentials or host config remain,
+- the README is clean and public-safe,
+- the production URL is a deployment artifact, not a dev or local link,
+- the app is deployed with the correct live environment variables set by the platform.
+
+## Limitations and honest status
+
+This project is production-minded and publication-ready in structure, but it still has some real-world limitations depending on deployment scale:
+
+- the in-memory rate limiter is appropriate for early-stage deployment but should be replaced with a distributed strategy if the app grows,
+- live Telegraph and wallet interactions depend on testnet connectivity and valid wallet funding,
+- benchmark and deterministic evaluation are still best treated as an evolving capability rather than a guarantee of perfect correctness.
+
+The app is designed as a transparent procurement and evidence layer rather than as a black-box AI executor.
 
 ## Official references
 
-- Hackathon: https://hackathon.telegraphprotocol.com/
-- Official rules: https://hackathon.telegraphprotocol.com/rules
-- Model Economy mission: https://hackathon.telegraphprotocol.com/missions/model-economy
-- Start Here: https://docs.telegraphprotocol.com/docs/using/consume-intelligence
-- x402 payments and receipts: https://docs.telegraphprotocol.com/docs/using/x402-inference
-- Engine API: https://docs.telegraphprotocol.com/docs/using/engine-ask
+- Telegraph Hackathon: https://hackathon.telegraphprotocol.com/
+- Telegraph docs: https://docs.telegraphprotocol.com/
+- x402 documentation: https://docs.telegraphprotocol.com/docs/using/x402-inference
+- Engine usage docs: https://docs.telegraphprotocol.com/docs/using/engine-ask
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
