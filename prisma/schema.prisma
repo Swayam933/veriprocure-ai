@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String                @id @default(cuid())
+  email                String                @unique
+  passwordHash         String
+  role                 String                @default("user")
+  isActive             Boolean               @default(true)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  sessions             Session[]
+  walletAuthorizations WalletAuthorization[]
+  procurementRuns     ProcurementRun[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model WalletAuthorization {
+  id        String   @id @default(cuid())
+  userId    String
+  address   String
+  label     String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, address])
+}
+
+model ProcurementRun {
+  id                    String   @id @default(cuid())
+  createdAt             DateTime @default(now())
+  userId                String?
+  task                  String
+  generatedText         String
+  referenceText         String?
+  evaluationText        String?
+  generationCost        Float    @default(0)
+  referenceCost         Float    @default(0)
+  evaluationCost        Float    @default(0)
+  totalCost             Float    @default(0)
+  generationMs          Int?
+  referenceMs           Int?
+  evaluationMs          Int?
+  generationIntent      String?
+  referenceIntent       String?
+  evaluationIntent      String?
+  generationMiner       String?
+  referenceMiner        String?
+  evaluationMiner       String?
+  generationHash        String?
+  referenceHash         String?
+  evaluationHash        String?
+  generationReceipt     String?
+  referenceReceipt      String?
+  evaluationReceipt     String?
+  generationVerified    Boolean  @default(false)
+  referenceVerified     Boolean  @default(false)
+  evaluationVerified    Boolean  @default(false)
+  evaluatorScore        Float?
+  generationResponse    String?
+  referenceResponse     String?
+  evaluationResponse    String?
+  generationIntentMatch Boolean  @default(false)
+  referenceIntentMatch  Boolean  @default(false)
+  evaluationIntentMatch Boolean  @default(false)
+  deterministicPass     Boolean  @default(false)
+  testResults           String?
+  benchmarkTaskId       String?
+  failureReason         String?
+  status                String   @default("pending")
+  user                  User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}

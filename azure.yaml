@@ -1,0 +1,8 @@
+name: veriprocure-ai
+metadata:
+  template: veriprocure-ai@0.0.1
+services:
+  web:
+    project: .
+    language: js
+    host: appservice
