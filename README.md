@@ -1,6 +1,8 @@
 # VeriProcure AI
 
-<img src="./VeriProcure%20AI_%20Trusted%20Procurement.png" alt="VeriProcure AI Trusted Procurement" width="700" />
+<p align="center">
+  <img src="./VeriProcure%20AI_%20Trusted%20Procurement.png" alt="VeriProcure AI Trusted Procurement" width="500" />
+</p>
 
 Live demo: https://veriprocure-ai.vercel.app
 
