@@ -33,9 +33,9 @@ button, input, textarea { font: inherit; }
 .btn:disabled { opacity: .55; cursor: not-allowed; }
 .pill { border: 1px solid #34405b; color: #b8c2dc; border-radius: 999px; padding: 4px 9px; font-size: 11px; }
 
-/* Let the dashboard use the full available viewport width. */
+/* Slightly wider than the default app width while keeping comfortable side gutters. */
 main > div:first-child {
-  width: 100%;
-  max-width: none !important;
-  margin-inline: 0 !important;
+  width: min(100%, 1800px);
+  max-width: 1800px;
+  margin: 0 auto;
 }
