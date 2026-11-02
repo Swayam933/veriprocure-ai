@@ -1,5 +1,12 @@
 # VeriProcure AI
 
+[![GitHub Repo stars](https://img.shields.io/github/stars/Swayam933/veriprocure-ai?style=social)](https://github.com/Swayam933/veriprocure-ai/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Swayam933/veriprocure-ai?style=social)](https://github.com/Swayam933/veriprocure-ai/network/members)
+[![License: MIT](https://img.shields.io/github/license/Swayam933/veriprocure-ai)](./LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/Swayam933/veriprocure-ai)](https://github.com/Swayam933/veriprocure-ai/commits)
+[![TypeScript](https://img.shields.io/badge/TypeScript-84%25-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js)](https://nextjs.org/)
+
 <p align="center">
   <img src="./VeriProcure%20AI_%20Trusted%20Procurement.png" alt="VeriProcure AI Trusted Procurement" width="500" />
 </p>
