@@ -162,6 +162,7 @@ The public UI is intentionally designed to avoid exposing private keys, raw inte
 ## Tech stack
 
 - Next.js 15
+- Docker
 - React 19
 - TypeScript
 - Prisma ORM
