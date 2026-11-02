@@ -8,7 +8,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js)](https://nextjs.org/)
 
 <p align="center">
-  <img src="./VeriProcure%20AI_%20Trusted%20Procurement.png" alt="VeriProcure AI Trusted Procurement" width="500" />
+  <img src="./VeriProcure%20AI_%20Verified%20Workflow%20Banner.png" alt="VeriProcure AI Verified Workflow Banner" width="500" />
 </p>
 
 Live demo: https://veriprocure-ai.vercel.app
