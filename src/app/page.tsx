@@ -84,7 +84,7 @@ type WalletData = {
 
 export default function Home() {
   const [task, setTask] = useState(
-    "Write a TypeScript function named isValidEmail(email: unknown): boolean that validates an email address. It must accept string inputs with standard local-part@domain.tld, reject non-strings, null, undefined, empty strings, strings without @, multiple @ signs, missing domain, missing top-level domain, or spaces. Return true for valid emails, false otherwise."
+    "Write a TypeScript function named isValidEmail(email: unknown): boolean that validates an email address. It must accept string inputs with standard local-part@domain.tld, reject non-strings, reject arrays, reject empty values, reject invalid domains, and ensure the local part does not contain whitespace or invalid punctuation."
   );
   const [selectedBenchmark, setSelectedBenchmark] = useState<string>("email-validator");
   const [benchmarks, setBenchmarks] = useState<BenchmarkTask[]>([]);
@@ -332,10 +332,10 @@ export default function Home() {
   const parsedTests = run?.testResults ? JSON.parse(run.testResults) : null;
 
   return (
-    <main className="min-h-screen px-4 py-6 md:px-8 md:py-9">
-      <div className="mx-auto max-w-7xl">
+    <main className="min-h-screen w-full py-4 md:py-6">
+      <div className="mx-0 w-full max-w-none">
         {/* Navigation & Live Wallet Bar */}
-        <header className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
+        <header className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5 px-2 md:px-4">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-400/30 bg-violet-500/10 shadow-lg shadow-violet-500/10">
               <Network className="text-violet-300" size={24} />
@@ -367,7 +367,7 @@ export default function Home() {
           </div>
         </header>
 
-        <section className="mb-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <section className="mb-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr] px-2 md:px-4">
           {authUser ? (
             <div className="panel flex flex-wrap items-center justify-between gap-3 p-4 md:p-5">
               <div>
@@ -466,7 +466,7 @@ export default function Home() {
         </section>
 
         {/* Hero Banner */}
-        <section className="mb-7 grid gap-6 lg:grid-cols-[1.45fr_.55fr]">
+        <section className="mb-7 grid gap-6 lg:grid-cols-[1.45fr_.55fr] px-2 md:px-4">
           <div className="panel p-6 md:p-8">
             <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[.2em] text-violet-300">
               <Sparkles size={15} /> Mission 10 / Model Economy Architecture
@@ -482,29 +482,18 @@ export default function Home() {
               sandbox to compute true <strong>cost per verified correct answer</strong>.
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-2">
-              <span className="pill border-violet-500/40 text-violet-200">
-                1. CODE_GENERATION_GENERAL
-              </span>
-              <span className="pill border-sky-500/40 text-sky-200">
-                2. QUESTION_ANSWERING_GENERAL
-              </span>
-              <span className="pill border-amber-500/40 text-amber-200">
-                3. LLM_OUTPUT_EVALUATION_GENERAL
-              </span>
-              <span className="pill border-emerald-500/40 text-emerald-200">
-                4. Deterministic Sandbox Pass
-              </span>
+              <span className="pill border-violet-500/40 text-violet-200">1. CODE_GENERATION_GENERAL</span>
+              <span className="pill border-sky-500/40 text-sky-200">2. QUESTION_ANSWERING_GENERAL</span>
+              <span className="pill border-amber-500/40 text-amber-200">3. LLM_OUTPUT_EVALUATION_GENERAL</span>
+              <span className="pill border-emerald-500/40 text-emerald-200">4. Deterministic Sandbox Pass</span>
             </div>
           </div>
 
           <div className="panel flex flex-col justify-between p-6">
             <div>
-              <div className="muted text-xs font-semibold uppercase tracking-wider">
-                Autonomous Spending Guard
-              </div>
+              <div className="muted text-xs font-semibold uppercase tracking-wider">Autonomous Spending Guard</div>
               <div className="mt-2 text-xs text-slate-300">
-                Server enforces a strict <strong>$0.02</strong> ceiling per 402 challenge and{" "}
-                <strong>$0.25</strong> daily budget before signing with the x402 SDK.
+                Server enforces a strict <strong>$0.02</strong> ceiling per 402 challenge and <strong>$0.25</strong> daily budget before signing with the x402 SDK.
               </div>
             </div>
 
@@ -515,9 +504,7 @@ export default function Home() {
               </div>
               <div className="rounded-xl bg-white/[.04] p-3.5">
                 <div className="muted text-xs">Total Spend</div>
-                <div className="mt-1 text-2xl font-bold">
-                  {fmt(history.reduce((a, b) => a + (b.totalCost || 0), 0))}
-                </div>
+                <div className="mt-1 text-2xl font-bold">{fmt(history.reduce((a, b) => a + (b.totalCost || 0), 0))}</div>
               </div>
               <div className="rounded-xl bg-white/[.04] p-3.5">
                 <div className="muted text-xs">Verified Signals</div>
@@ -534,15 +521,13 @@ export default function Home() {
               </div>
               <div className="rounded-xl bg-white/[.04] p-3.5">
                 <div className="muted text-xs">Deterministic Passes</div>
-                <div className="mt-1 text-xl font-bold text-sky-300">
-                  {history.filter((r) => r.deterministicPass).length}
-                </div>
+                <div className="mt-1 text-xl font-bold text-sky-300">{history.filter((r) => r.deterministicPass).length}</div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="panel mb-6 p-5 md:p-6">
+        <section className="panel mb-6 p-5 md:p-6 mx-2 md:mx-4">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Wallet className="text-violet-300" size={18} />
@@ -619,7 +604,7 @@ export default function Home() {
         </section>
 
         {/* Studio / Task Procurement Grid */}
-        <section className="grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
+        <section className="grid gap-6 lg:grid-cols-[1.1fr_.9fr] px-2 md:px-4">
           {/* Left: Input & Benchmark Selector */}
           <div className="panel p-5 md:p-6">
             <div className="mb-4 flex items-center justify-between">
@@ -627,9 +612,7 @@ export default function Home() {
                 <Bot className="text-violet-300" size={20} />
                 <h2 className="text-lg font-bold">Procurement Workbench</h2>
               </div>
-              <span className="pill border-emerald-500/40 text-emerald-300">
-                x402 Sepolia USDC Active
-              </span>
+              <span className="pill border-emerald-500/40 text-emerald-300">x402 Sepolia USDC Active</span>
             </div>
 
             {/* Quick Benchmark Preset Buttons */}
@@ -671,8 +654,7 @@ export default function Home() {
 
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
               <div className="muted text-xs">
-                Exposure per full run: ~<strong className="text-slate-200">$0.03</strong> (3 calls
-                @ $0.01 max $0.02)
+                Exposure per full run: ~<strong className="text-slate-200">$0.03</strong> (3 calls @ $0.01 max $0.02)
               </div>
               <button
                 type="button"
@@ -702,9 +684,7 @@ export default function Home() {
             {/* Stepper Feedback while busy */}
             {busy && (
               <div className="mt-5 space-y-2.5 rounded-xl border border-violet-500/20 bg-violet-500/[.04] p-4 text-xs">
-                <div className="mb-2 font-semibold text-violet-200">
-                  Live Telegraph Procurement Workflow:
-                </div>
+                <div className="mb-2 font-semibold text-violet-200">Live Telegraph Procurement Workflow:</div>
                 {[
                   { label: "1. Purchasing CODE_GENERATION_GENERAL intelligence", step: 1 },
                   { label: "2. Purchasing QUESTION_ANSWERING_GENERAL acceptance criteria", step: 2 },
@@ -714,9 +694,7 @@ export default function Home() {
                   <div
                     key={s.step}
                     className={`flex items-center gap-2.5 ${
-                      currentStep >= s.step
-                        ? "font-medium text-slate-100"
-                        : "muted opacity-60"
+                      currentStep >= s.step ? "font-medium text-slate-100" : "muted opacity-60"
                     }`}
                   >
                     {currentStep === s.step ? (
@@ -780,9 +758,7 @@ export default function Home() {
                     type="button"
                     onClick={() => setActiveTab("code")}
                     className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
-                      activeTab === "code"
-                        ? "bg-violet-500/30 text-violet-200"
-                        : "text-slate-400 hover:text-white"
+                      activeTab === "code" ? "bg-violet-500/30 text-violet-200" : "text-slate-400 hover:text-white"
                     }`}
                   >
                     Generated Code
@@ -791,23 +767,17 @@ export default function Home() {
                     type="button"
                     onClick={() => setActiveTab("tests")}
                     className={`flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition ${
-                      activeTab === "tests"
-                        ? "bg-sky-500/30 text-sky-200"
-                        : "text-slate-400 hover:text-white"
+                      activeTab === "tests" ? "bg-sky-500/30 text-sky-200" : "text-slate-400 hover:text-white"
                     }`}
                   >
                     Sandbox Tests
-                    {run.deterministicPass ? (
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                    ) : null}
+                    {run.deterministicPass ? (<span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />) : null}
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveTab("requirements")}
                     className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
-                      activeTab === "requirements"
-                        ? "bg-sky-500/30 text-sky-200"
-                        : "text-slate-400 hover:text-white"
+                      activeTab === "requirements" ? "bg-sky-500/30 text-sky-200" : "text-slate-400 hover:text-white"
                     }`}
                   >
                     QA Requirements
@@ -816,9 +786,7 @@ export default function Home() {
                     type="button"
                     onClick={() => setActiveTab("evaluation")}
                     className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
-                      activeTab === "evaluation"
-                        ? "bg-emerald-500/30 text-emerald-200"
-                        : "text-slate-400 hover:text-white"
+                      activeTab === "evaluation" ? "bg-emerald-500/30 text-emerald-200" : "text-slate-400 hover:text-white"
                     }`}
                   >
                     LLM Evaluation
@@ -827,9 +795,7 @@ export default function Home() {
                     type="button"
                     onClick={() => setActiveTab("proof")}
                     className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
-                      activeTab === "proof"
-                        ? "bg-amber-500/30 text-amber-200"
-                        : "text-slate-400 hover:text-white"
+                      activeTab === "proof" ? "bg-amber-500/30 text-amber-200" : "text-slate-400 hover:text-white"
                     }`}
                   >
                     Cryptographic Proof
@@ -851,9 +817,7 @@ export default function Home() {
                       {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
                       {copied ? "Copied" : "Copy"}
                     </button>
-                    <div className="mb-2 text-xs font-bold text-violet-300">
-                      GENERATED CODE ARTIFACT
-                    </div>
+                    <div className="mb-2 text-xs font-bold text-violet-300">GENERATED CODE ARTIFACT</div>
                     <pre className="max-h-64 overflow-auto whitespace-pre-wrap font-mono text-xs leading-5 text-slate-200">
                       {run.generatedText}
                     </pre>
@@ -863,19 +827,14 @@ export default function Home() {
                 {activeTab === "tests" && (
                   <div className="rounded-xl bg-black/40 p-3.5">
                     <div className="mb-2 flex items-center justify-between">
-                      <div className="text-xs font-bold text-sky-300">
-                        DETERMINISTIC SANDBOX TEST RUNNER
-                      </div>
+                      <div className="text-xs font-bold text-sky-300">DETERMINISTIC SANDBOX TEST RUNNER</div>
                       {parsedTests && (
                         <span
                           className={`rounded px-2 py-0.5 text-xs font-bold ${
-                            parsedTests.passed
-                              ? "bg-emerald-500/20 text-emerald-300"
-                              : "bg-rose-500/20 text-rose-300"
+                            parsedTests.passed ? "bg-emerald-500/20 text-emerald-300" : "bg-rose-500/20 text-rose-300"
                           }`}
                         >
-                          {parsedTests.passedTests}/{parsedTests.totalTests} Assertions Passed (
-                          {parsedTests.executionMs}ms)
+                          {parsedTests.passedTests}/{parsedTests.totalTests} Assertions Passed ({parsedTests.executionMs}ms)
                         </span>
                       )}
                     </div>
@@ -900,16 +859,12 @@ export default function Home() {
                           </div>
                         )}
                         <div className="mt-3 text-[11px] text-slate-400">
-                          Cost per verified correct answer:{" "}
-                          <strong className="text-emerald-300">
-                            {run.deterministicPass ? fmt(run.totalCost) : "N/A (Failed test suite)"}
-                          </strong>
+                          Cost per verified correct answer: <strong className="text-emerald-300">{run.deterministicPass ? fmt(run.totalCost) : "N/A (Failed test suite)"}</strong>
                         </div>
                       </div>
                     ) : (
                       <div className="text-xs text-slate-400">
-                        No benchmark test suite was associated with this run. Select a benchmark
-                        above to enable automatic deterministic unit testing.
+                        No benchmark test suite was associated with this run. Select a benchmark above to enable automatic deterministic unit testing.
                       </div>
                     )}
                   </div>
@@ -917,9 +872,7 @@ export default function Home() {
 
                 {activeTab === "requirements" && (
                   <div className="rounded-xl bg-black/40 p-3.5">
-                    <div className="mb-2 text-xs font-bold text-sky-300">
-                      INDEPENDENT REQUIREMENTS &amp; ACCEPTANCE CHECKLIST
-                    </div>
+                    <div className="mb-2 text-xs font-bold text-sky-300">INDEPENDENT REQUIREMENTS &amp; ACCEPTANCE CHECKLIST</div>
                     <pre className="max-h-64 overflow-auto whitespace-pre-wrap font-mono text-xs leading-5 text-slate-200">
                       {run.referenceText || "No independent reference returned."}
                     </pre>
@@ -929,9 +882,7 @@ export default function Home() {
                 {activeTab === "evaluation" && (
                   <div className="rounded-xl bg-black/40 p-3.5">
                     <div className="mb-2 flex items-center justify-between">
-                      <div className="text-xs font-bold text-emerald-300">
-                        LLM OUTPUT EVALUATION ASSESSMENT
-                      </div>
+                      <div className="text-xs font-bold text-emerald-300">LLM OUTPUT EVALUATION ASSESSMENT</div>
                       <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300">
                         Score: {run.evaluatorScore !== null ? `${run.evaluatorScore}/100` : "Assessed"}
                       </span>
@@ -944,9 +895,7 @@ export default function Home() {
 
                 {activeTab === "proof" && (
                   <div className="space-y-3 rounded-xl bg-black/40 p-3.5 text-xs">
-                    <div className="text-xs font-bold text-amber-300">
-                      TELEGRAPH ON-CHAIN &amp; DEVNODE RECEIPTS
-                    </div>
+                    <div className="text-xs font-bold text-amber-300">TELEGRAPH ON-CHAIN &amp; DEVNODE RECEIPTS</div>
                     <div className="space-y-2">
                       <ProofRow
                         label="Code Generation"
@@ -983,9 +932,7 @@ export default function Home() {
                 </div>
                 <div className="font-bold text-slate-200">Ready for procurement</div>
                 <p className="muted mt-2 max-w-xs text-xs leading-5">
-                  Select a benchmark or submit a task to initiate the three-purchase Telegraph
-                  workflow. Actual receipts, costs, and cryptographic signals will be displayed
-                  here.
+                  Select a benchmark or submit a task to initiate the three-purchase Telegraph workflow. Actual receipts, costs, and cryptographic signals will be displayed here.
                 </p>
               </div>
             )}
@@ -993,7 +940,7 @@ export default function Home() {
         </section>
 
         {/* Live Mission Readiness Panel */}
-        <section className="panel mt-6 p-5 md:p-6">
+        <section className="panel mt-6 p-5 md:p-6 mx-2 md:mx-4">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Activity className="text-sky-300" size={18} />
@@ -1001,9 +948,7 @@ export default function Home() {
             </div>
             <span
               className={`pill font-semibold ${
-                readiness?.ready
-                  ? "border-emerald-500/40 text-emerald-300"
-                  : "border-amber-500/40 text-amber-300"
+                readiness?.ready ? "border-emerald-500/40 text-emerald-300" : "border-amber-500/40 text-amber-300"
               }`}
             >
               {readiness?.ready ? "All Required Intents Covered" : "Connecting to Devnode"}
@@ -1025,9 +970,7 @@ export default function Home() {
                     {x.liveMinerCount ?? 0} active miners
                   </span>
                 </div>
-                <div className="muted mt-2 font-mono text-[11px]">
-                  {x.canonicalIntent || x.intent}
-                </div>
+                <div className="muted mt-2 font-mono text-[11px]">{x.canonicalIntent || x.intent}</div>
                 <div className="mt-2 text-[11px] text-slate-400">
                   Schema: {x.schemaAvailable ? "Validated on-chain" : "Loading"}
                 </div>
@@ -1040,7 +983,7 @@ export default function Home() {
         <LeaderboardSection />
 
         {/* History Table */}
-        <section className="panel mt-6 p-5 md:p-6">
+        <section className="panel mt-6 p-5 md:p-6 mx-2 md:mx-4">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Activity className="text-violet-300" size={18} />
@@ -1070,9 +1013,7 @@ export default function Home() {
                       onClick={() => setRun(h)}
                       className="cursor-pointer border-b border-white/5 transition hover:bg-white/[.02]"
                     >
-                      <td className="max-w-xs truncate py-3 pr-3 font-medium text-slate-200">
-                        {h.task}
-                      </td>
+                      <td className="max-w-xs truncate py-3 pr-3 font-medium text-slate-200">{h.task}</td>
                       <td className="muted whitespace-nowrap">
                         {new Date(h.createdAt).toLocaleTimeString([], {
                           hour: "2-digit",
@@ -1082,20 +1023,13 @@ export default function Home() {
                       <td className="font-semibold text-slate-100">{fmt(h.totalCost)}</td>
                       <td>
                         <span className="pill text-[10px] text-emerald-300">
-                          {[h.generationVerified, h.referenceVerified, h.evaluationVerified].filter(
-                            Boolean
-                          ).length}
-                          /3
+                          {[h.generationVerified, h.referenceVerified, h.evaluationVerified].filter(Boolean).length}/3
                         </span>
                       </td>
-                      <td className="text-slate-300">
-                        {h.evaluatorScore !== null ? `${h.evaluatorScore}/100` : "—"}
-                      </td>
+                      <td className="text-slate-300">{h.evaluatorScore !== null ? `${h.evaluatorScore}/100` : "—"}</td>
                       <td>
                         {h.deterministicPass ? (
-                          <span className="pill border-emerald-500/40 text-[10px] text-emerald-300">
-                            Pass
-                          </span>
+                          <span className="pill border-emerald-500/40 text-[10px] text-emerald-300">Pass</span>
                         ) : (
                           <span className="pill text-[10px] text-slate-400">—</span>
                         )}
@@ -1103,9 +1037,7 @@ export default function Home() {
                       <td>
                         <span
                           className={`pill text-[10px] ${
-                            h.status === "completed"
-                              ? "border-emerald-500/40 text-emerald-300"
-                              : "text-amber-300"
+                            h.status === "completed" ? "border-emerald-500/40 text-emerald-300" : "text-amber-300"
                           }`}
                         >
                           {h.status}
@@ -1142,21 +1074,16 @@ export default function Home() {
               <div className="mt-4 space-y-3 overflow-auto text-xs">
                 <div>
                   <div className="muted text-[10px] uppercase">Signal Hash</div>
-                  <div className="mt-1 break-all font-mono font-semibold text-emerald-300">
-                    {inspectingSignal}
-                  </div>
+                  <div className="mt-1 break-all font-mono font-semibold text-emerald-300">{inspectingSignal}</div>
                 </div>
 
                 {signalLoading ? (
                   <div className="flex items-center justify-center py-8 text-slate-400">
-                    <RefreshCw className="mr-2 animate-spin" size={16} /> Querying Telegraph
-                    Devnode engine...
+                    <RefreshCw className="mr-2 animate-spin" size={16} /> Querying Telegraph Devnode engine...
                   </div>
                 ) : (
                   <div>
-                    <div className="muted mb-1 text-[10px] uppercase">
-                      Devnode Verification Payload
-                    </div>
+                    <div className="muted mb-1 text-[10px] uppercase">Devnode Verification Payload</div>
                     <pre className="max-h-72 overflow-auto rounded-xl bg-black/40 p-3 font-mono text-[11px] leading-5 text-slate-300">
                       {JSON.stringify(signalDetails, null, 2)}
                     </pre>
@@ -1178,7 +1105,7 @@ export default function Home() {
         )}
 
         {/* Footer */}
-        <footer className="muted mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5 text-xs">
+        <footer className="muted mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5 text-xs px-2 md:px-4">
           <span>VeriProcure AI · Telegraph Hackathon Season II · Track 03: Apps &amp; Agents / Mission 10</span>
           <span className="flex items-center gap-2">
             <ShieldCheck size={14} className="text-emerald-400" /> Live Sepolia Testnet · x402 Micropayments
@@ -1201,9 +1128,7 @@ function MetricCard({
   return (
     <div
       className={`rounded-xl p-3 ${
-        highlight
-          ? "border border-violet-500/30 bg-violet-500/10 text-violet-200"
-          : "bg-white/[.04] text-slate-200"
+        highlight ? "border border-violet-500/30 bg-violet-500/10 text-violet-200" : "bg-white/[.04] text-slate-200"
       }`}
     >
       <div className="muted text-[10px] uppercase tracking-wider">{label}</div>
@@ -1231,16 +1156,10 @@ function ProofRow({
     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-2">
       <div>
         <div className="font-semibold text-slate-200">{label}</div>
-        <div className="muted text-[11px]">
-          {miner || "Unreported miner"} · {intent || "unreported"}
-        </div>
+        <div className="muted text-[11px]">{miner || "Unreported miner"} · {intent || "unreported"}</div>
       </div>
       <div className="flex items-center gap-2">
-        <span
-          className={`pill text-[10px] ${
-            verified ? "border-emerald-500/40 text-emerald-300" : "text-amber-300"
-          }`}
-        >
+        <span className={`pill text-[10px] ${verified ? "border-emerald-500/40 text-emerald-300" : "text-amber-300"}`}>
           {verified ? "Verified Signal" : "Signal Unverified"}
         </span>
         {hash ? (
@@ -1274,7 +1193,7 @@ function LeaderboardSection() {
   const summary = data?.summary;
 
   return (
-    <section className="panel mt-6 p-5 md:p-6">
+    <section className="panel mt-6 p-5 md:p-6 mx-2 md:mx-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Gauge className="text-violet-300" size={18} />
@@ -1287,9 +1206,7 @@ function LeaderboardSection() {
         )}
       </div>
       <p className="muted mb-4 text-xs">
-        Dual-metric evaluation ranking: LLM evaluator score (opinion) paired with deterministic
-        sandbox verification (executable ground truth). Cost-per-verified-correct is calculated
-        exclusively when candidate code passes all unit test assertions.
+        Dual-metric evaluation ranking: LLM evaluator score (opinion) paired with deterministic sandbox verification (executable ground truth). Cost-per-verified-correct is calculated exclusively when candidate code passes all unit test assertions.
       </p>
 
       {items.length > 0 ? (
@@ -1313,15 +1230,12 @@ function LeaderboardSection() {
                   <td>{x.calls}</td>
                   <td>${Number(x.spend).toFixed(4)}</td>
                   <td>
-                    {x.averageEvaluatorScore !== null
-                      ? `${Number(x.averageEvaluatorScore).toFixed(1)}/100`
-                      : "—"}
+                    {x.averageEvaluatorScore !== null ? `${Number(x.averageEvaluatorScore).toFixed(1)}/100` : "—"}
                   </td>
                   <td>
                     {x.deterministicPassRate !== null ? (
                       <span className="font-semibold text-sky-300">
-                        {Number(x.deterministicPassRate).toFixed(0)}% ({x.deterministicPasses}/
-                        {x.generationCalls})
+                        {Number(x.deterministicPassRate).toFixed(0)}% ({x.deterministicPasses}/{x.generationCalls})
                       </span>
                     ) : (
                       "—"
@@ -1329,9 +1243,7 @@ function LeaderboardSection() {
                   </td>
                   <td>
                     {x.costPerVerifiedCorrectAnswer !== null ? (
-                      <span className="font-bold text-emerald-300">
-                        ${Number(x.costPerVerifiedCorrectAnswer).toFixed(4)}
-                      </span>
+                      <span className="font-bold text-emerald-300">${Number(x.costPerVerifiedCorrectAnswer).toFixed(4)}</span>
                     ) : (
                       <span className="muted text-[11px]">Unverified</span>
                     )}
@@ -1345,9 +1257,7 @@ function LeaderboardSection() {
           </table>
         </div>
       ) : (
-        <div className="py-6 text-center text-xs muted">
-          Provider economics will update automatically as paid runs are completed.
-        </div>
+        <div className="py-6 text-center text-xs muted">Provider economics will update automatically as paid runs are completed.</div>
       )}
     </section>
   );

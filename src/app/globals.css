@@ -33,9 +33,16 @@ button, input, textarea { font: inherit; }
 .btn:disabled { opacity: .55; cursor: not-allowed; }
 .pill { border: 1px solid #34405b; color: #b8c2dc; border-radius: 999px; padding: 4px 9px; font-size: 11px; }
 
-/* Slightly wider than the default app width while keeping comfortable side gutters. */
+main {
+  width: 100%;
+}
+
 main > div:first-child {
-  width: min(100%, 1800px);
-  max-width: 1800px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
 }
